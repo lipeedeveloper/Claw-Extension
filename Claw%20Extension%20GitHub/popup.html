@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Claw</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<style>
+/* ── Paleta ─────────────────────────── */
+:root{
+  --bg:    #16161a;
+  --bg2:   #1e1e24;
+  --bg3:   #26262e;
+  --bg4:   #2f2f38;
+  --ln:    #34343d;
+  --ln2:   #42424d;
+  --t:     #f0f0f2;
+  --t2:    #b0b0bc;
+  --t3:    #6e6e7c;
+  --ac:    #cc7832;
+  --ac2:   #b8662a;
+  --ac3:   #e8915a;
+  --ok:    #5a9e6f;
+  --ok2:   #7cba8e;
+  --err:   #c05050;
+  --r:     13px;
+  --rsm:   8px;
+  --font: 'Plus Jakarta Sans','Inter',system-ui,sans-serif;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.35);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.4);
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  width:370px;background:var(--bg);color:var(--t);
+  font-family:var(--font);font-size:13px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+a{color:var(--ac3)}
+hr{border:none;border-top:1px solid var(--ln);margin:0}
+
+/* ── Animações ─────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+@keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
+/* ── HEADER ─────────────────────────────── */
+.hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:13px 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:rgba(22,22,26,.85);
+  position:relative;z-index:100;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.menu-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.menu-btn .material-symbols-outlined{
+  font-size:20px;color:var(--t2);transition:color .2s;
+}
+.menu-btn:hover{
+  background:rgba(204,120,50,.12);
+  border-color:rgba(204,120,50,.25);
+}
+.menu-btn:hover .material-symbols-outlined{color:var(--ac3)}
+.menu-btn:active{transform:scale(.95)}
+
+.hdr-icon{
+  width:28px;height:28px;flex-shrink:0;object-fit:contain;
+  cursor:pointer;border-radius:7px;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),filter .2s;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));
+}
+.hdr-icon:hover{transform:scale(1.18) rotate(-10deg)}
+.hdr-icon:active{transform:scale(.95)}
+.hdr-name{
+  font-size:15px;font-weight:700;letter-spacing:-.4px;
+  background:linear-gradient(135deg,#f0f0f2 40%,#9090a0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hdr-sub{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:5px;margin-top:1px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:all .3s}
+.live-dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(90,158,111,.2);animation:pulse 2.4s ease-in-out infinite}
+.v-tag{
+  margin-left:auto;font-size:9px;font-weight:700;
+  color:var(--ac3);
+  background:rgba(204,120,50,.12);
+  border:1px solid rgba(204,120,50,.28);border-radius:20px;
+  padding:2px 9px;letter-spacing:.3px;
+}
+
+/* ── SIDEBAR MENU ─────────────────────── */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:280px;
+  background:rgba(22,22,26,.98);
+  border-right:1px solid rgba(255,255,255,.08);
+  transform:translateX(-100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  z-index:1000;overflow-y:auto;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.sidebar.open{transform:translateX(0)}
+.sidebar-header{
+  padding:16px;border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-title{font-size:14px;font-weight:700;color:var(--t)}
+.close-menu{
+  width:30px;height:30px;border-radius:6px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+}
+.close-menu .material-symbols-outlined{font-size:18px;color:var(--t2)}
+.close-menu:hover{background:var(--err);border-color:var(--err)}
+.close-menu:hover .material-symbols-outlined{color:#fff}
+
+.menu-section{padding:12px 16px}
+.menu-section-title{
+  font-size:9px;font-weight:700;color:var(--t3);
+  letter-spacing:1px;text-transform:uppercase;
+  padding:0 0 8px 0;display:flex;align-items:center;gap:6px;
+}
+.menu-section-title::after{content:'';flex:1;height:1px;background:var(--ln);opacity:.5}
+
+.menu-item{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  border-radius:var(--rsm);cursor:pointer;
+  transition:all .2s;margin-bottom:4px;
+}
+.menu-item .material-symbols-outlined{
+  font-size:20px;color:var(--t3);transition:color .2s;
+}
+.menu-item-info{flex:1}
+.menu-item-label{font-size:12px;font-weight:600;color:var(--t2)}
+.menu-item-sub{font-size:9px;color:var(--t3);margin-top:2px}
+.menu-item:hover{background:rgba(255,255,255,.05)}
+.menu-item:hover .material-symbols-outlined{color:var(--ac3)}
+.menu-item:hover .menu-item-label{color:var(--t)}
+.menu-item.active{background:rgba(204,120,50,.12);border-left:3px solid var(--ac)}
+.menu-item.active .material-symbols-outlined{color:var(--ac3)}
+.menu-item.active .menu-item-label{color:var(--ac3)}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;z-index:999;
+  backdrop-filter:blur(2px);
+}
+.overlay.show{opacity:1;pointer-events:all}
+
+/* ── VIEW CONTAINER ─────────────────────── */
+.view-container{
+  height:calc(100vh - 60px);overflow-y:auto;overflow-x:hidden;
+}
+.view{display:none;padding:10px 12px 16px;animation:fadeIn .3s ease}
+.view.active{display:block}
+
+/* ── SECTION LABEL ───────────────────── */
+.sec{
+  font-size:9px;font-weight:700;color:var(--t3);
+  letter-spacing:1px;text-transform:uppercase;
+  padding:6px 2px 2px;display:flex;align-items:center;gap:6px;
+}
+.sec::after{content:'';flex:1;height:1px;background:var(--ln);opacity:.5}
+
+/* ── CARD ─────────────────────────────── */
+.card{
+  background:rgba(30,30,36,.7);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  padding:11px 13px;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+  animation:fadeUp .22s ease both;
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  margin-bottom:8px;
+}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(145deg,rgba(255,255,255,.03) 0%,transparent 50%);
+  pointer-events:none;
+}
+.card:hover{
+  border-color:rgba(255,255,255,.12);
+  background:rgba(34,34,42,.8);
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.card-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.card-icon{
+  width:35px;height:35px;border-radius:11px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;
+}
+.card-icon .material-symbols-outlined{font-size:18px;color:var(--t2);transition:color .2s,transform .2s}
+.card:hover .card-icon{
+  background:rgba(204,120,50,.12);
+  border-color:rgba(204,120,50,.25);
+}
+.card:hover .card-icon .material-symbols-outlined{color:var(--ac3);transform:scale(1.1)}
+.card-info{flex:1;min-width:0}
+.card-label{font-size:12.5px;font-weight:600;letter-spacing:-.15px}
+.card-sub{font-size:10px;color:var(--t3);margin-top:1px;line-height:1.4;font-weight:400}
+
+/* ── PILL ─────────────────────────────── */
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9.5px;font-weight:600;color:var(--t3);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:2px 9px;margin-top:6px;
+  transition:all .25s;letter-spacing:.1px;
+}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:var(--t3);transition:all .25s;flex-shrink:0}
+.pill.on{
+  color:var(--ok2);
+  background:rgba(90,158,111,.1);
+  border-color:rgba(90,158,111,.3);
+}
+.pill.on .pill-dot{
+  background:var(--ok);
+  box-shadow:0 0 0 2px rgba(90,158,111,.25);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+
+/* ── TOGGLE ─────────────────────────── */
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.track{
+  position:absolute;inset:0;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:22px;cursor:pointer;
+  transition:background .2s,border-color .2s,box-shadow .2s;
+}
+.track::before{
+  content:'';position:absolute;
+  left:2px;top:2px;width:16px;height:16px;
+  background:#fff;border-radius:50%;
+  transition:transform .2s,background .2s;
+  box-shadow:0 2px 4px rgba(0,0,0,.3);
+}
+input:checked + .track{
+  background:var(--ok);
+  border-color:var(--ok);
+  box-shadow:0 0 0 3px rgba(90,158,111,.15);
+}
+input:checked + .track::before{
+  transform:translateX(18px);
+}
+
+/* ── CHAT STYLES ─────────────────────── */
+.chat-box{
+  display:flex;flex-direction:column;
+  background:rgba(30,30,36,.5);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r);overflow:hidden;
+  margin-bottom:10px;
+}
+.msgs{
+  flex:1;padding:10px;overflow-y:auto;
+  max-height:280px;min-height:120px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.msg{
+  display:flex;gap:8px;align-items:flex-start;
+  animation:fadeUp .2s ease;
+}
+.msg-avatar{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--ln);
+  display:flex;align-items:center;justify-content:center;
+}
+.msg-avatar .material-symbols-outlined{font-size:14px;color:var(--t3)}
+.msg.user .msg-avatar{background:rgba(204,120,50,.15);border-color:var(--ac)}
+.msg.user .msg-avatar .material-symbols-outlined{color:var(--ac3)}
+.msg-body{
+  flex:1;background:var(--bg3);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:8px 11px;
+  font-size:11.5px;line-height:1.6;color:var(--t2);
+}
+.msg.user .msg-body{
+  background:rgba(204,120,50,.08);
+  border-color:rgba(204,120,50,.2);
+  color:var(--t);
+}
+.msg-typing{
+  display:flex;gap:4px;padding:4px 0;
+}
+.msg-typing span{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--t3);
+  animation:blink 1.4s ease-in-out infinite;
+}
+.msg-typing span:nth-child(2){animation-delay:.2s}
+.msg-typing span:nth-child(3){animation-delay:.4s}
+
+.chips{
+  display:flex;gap:6px;padding:8px 10px;
+  flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06);
+}
+.chip{
+  background:var(--bg3);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:5px 12px;font-size:10px;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  color:var(--t2);font-weight:500;
+}
+.chip:hover{
+  background:rgba(204,120,50,.12);
+  border-color:var(--ac);color:var(--ac3);
+  transform:translateY(-1px);
+}
+
+.input-row{
+  display:flex;gap:6px;padding:10px;
+  border-top:1px solid rgba(255,255,255,.06);
+  align-items:flex-end;
+}
+.agent-input{
+  flex:1;background:var(--bg3);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--rsm);color:var(--t2);
+  font-size:11.5px;padding:7px 10px;
+  font-family:var(--font);resize:none;
+  outline:none;line-height:1.5;
+  max-height:80px;min-height:36px;
+  transition:border-color .2s;
+}
+.agent-input:focus{border-color:var(--ac)}
+.agent-input::placeholder{color:var(--t3)}
+
+.send-btn{
+  width:36px;height:36px;border-radius:var(--rsm);
+  background:var(--bg3);border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.send-btn .material-symbols-outlined{
+  font-size:18px;color:var(--t3);transition:color .2s;
+}
+.send-btn.ready{
+  background:var(--ac);border-color:var(--ac);
+}
+.send-btn.ready .material-symbols-outlined{color:#fff}
+.send-btn.ready:hover{
+  background:var(--ac2);transform:scale(1.05);
+}
+.send-btn.off{opacity:.5;cursor:not-allowed}
+
+/* ── INPUTS ─────────────────────────── */
+textarea,select,input[type="range"]{
+  width:100%;background:var(--bg3);border:1px solid var(--ln);
+  border-radius:var(--rsm);color:var(--t2);font-size:11px;
+  padding:7px 9px;font-family:var(--font);
+  outline:none;transition:border-color .2s;
+}
+textarea{resize:vertical;min-height:52px;line-height:1.5}
+textarea:focus,select:focus{border-color:var(--ac)}
+select{cursor:pointer}
+
+.slider-row{
+  display:flex;align-items:center;gap:10px;padding-top:4px;
+}
+.slider-label{font-size:10px;color:var(--t3);flex-shrink:0}
+.slider-val{
+  font-size:10px;color:var(--ac3);font-weight:600;
+  background:rgba(204,120,50,.1);border-radius:4px;
+  padding:2px 8px;min-width:40px;text-align:center;
+}
+input[type="range"]{
+  flex:1;padding:0;height:4px;
+  -webkit-appearance:none;appearance:none;
+  background:var(--ln);border:none;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--ac3);cursor:pointer;
+  transition:all .2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover{
+  transform:scale(1.2);box-shadow:0 0 0 4px rgba(204,120,50,.2);
+}
+
+.btn-sm{
+  font-size:10px;padding:5px 11px;border-radius:6px;
+  font-family:var(--font);font-weight:600;
+  cursor:pointer;transition:all .2s;border:1px solid;
+}
+.btn-sm.danger{
+  background:rgba(192,80,80,.1);
+  border-color:rgba(192,80,80,.3);
+  color:var(--err);
+}
+.btn-sm.danger:hover{
+  background:var(--err);color:#fff;
+  transform:translateY(-1px);
+}
+
+/* ── STATS ─────────────────────────── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.stat-card{
+  background:rgba(30,30,36,.7);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);padding:12px;
+  text-align:center;transition:all .2s;
+  animation:fadeUp .22s ease both;
+}
+.stat-card:hover{
+  border-color:rgba(255,255,255,.12);
+  transform:translateY(-2px);
+}
+.stat-num{
+  font-size:22px;font-weight:700;
+  background:linear-gradient(135deg,var(--ac3),var(--ac));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:10px;color:var(--t3);margin-top:2px;font-weight:600}
+.stat-today{font-size:9px;color:var(--t3);margin-top:4px}
+
+.cache-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:8px;
+}
+.cache-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.cache-num{font-size:18px;font-weight:700;color:var(--ac3);margin-top:2px}
+
+.hist-list{
+  background:rgba(30,30,36,.5);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--rsm);padding:8px;
+  max-height:200px;overflow-y:auto;
+}
+.hist-empty{
+  text-align:center;padding:20px;
+  font-size:10px;color:var(--t3);
+}
+.hist-item{
+  padding:6px 8px;border-radius:6px;
+  font-size:10px;margin-bottom:4px;
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);
+  transition:background .2s;
+}
+.hist-item:hover{background:var(--bg4)}
+.hist-icon{
+  width:20px;height:20px;border-radius:4px;
+  background:rgba(204,120,50,.1);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.hist-icon .material-symbols-outlined{font-size:12px;color:var(--ac3)}
+.hist-text{flex:1;color:var(--t2)}
+.hist-time{font-size:9px;color:var(--t3)}
+
+.row-between{display:flex;align-items:center;justify-content:space-between}
+
+.footer{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:12px 0;align-items:center;
+  font-size:9px;color:var(--t3);
+}
+.badge{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;padding:3px 8px;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.badge-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--t3);
+}
+.badge-dot.ok{background:var(--ok)}
+
+.credits{
+  text-align:center;font-size:9px;color:var(--t3);
+  padding:8px 0;
+}
+.credits span{color:var(--ac3);font-weight:600}
+
+kbd{
+  background:var(--bg3);border:1px solid var(--ln2);
+  border-radius:5px;padding:2px 8px;font-size:11px;
+  color:var(--ac3);font-family:monospace;
+  display:inline-block;
+}
+
+/* ── VOICE & SCREENSHOT BUTTONS ─────── */
+#btnVoice, #btnScreenshot, #btnUploadImg {
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--rsm);
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s; flex-shrink: 0;
+  user-select: none;
+}
+#btnVoice:hover {
+  background: rgba(204,120,50,.12);
+  border-color: rgba(204,120,50,.4);
+}
+#btnVoice:hover .material-symbols-outlined { color: var(--ac3); }
+#btnScreenshot:hover {
+  background: rgba(90,158,111,.12);
+  border-color: rgba(90,158,111,.35);
+}
+#btnScreenshot:hover .material-symbols-outlined { color: var(--ok2); }
+#btnUploadImg:hover {
+  background: rgba(80,130,200,.12);
+  border-color: rgba(80,130,200,.35);
+}
+#btnUploadImg:hover .material-symbols-outlined { color: #7eb8f7; }
+#btnVoice.listening {
+  background: rgba(204,120,50,.2);
+  border-color: var(--ac);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+#btnVoice.listening .material-symbols-outlined { color: var(--ac3); }
+#imgPreviewWrap { width: 100%; }
+#btnClearChat .material-symbols-outlined { color: var(--t3); transition: color .2s; }
+#btnClearChat:hover {
+  background: rgba(192,80,80,.12) !important;
+  border-color: rgba(192,80,80,.3) !important;
+}
+#btnClearChat:hover .material-symbols-outlined { color: var(--err) !important; }
+/* ── QUICK TRANSLATOR ─────────────────────── */
+#qtr-panel{display:none;border-top:1px solid var(--ln);padding:10px 12px;background:var(--bg2);flex-direction:column;gap:7px}
+#qtr-panel.open{display:flex}
+.qtr-box{flex:1;background:var(--bg3);border:1px solid var(--ln2);border-radius:var(--rsm);color:var(--t);font-family:var(--font);font-size:11.5px;line-height:1.5;padding:7px 10px;resize:none;outline:none;min-height:52px;transition:border-color .15s}
+.qtr-box:focus{border-color:var(--ac)}
+.qtr-box[readonly]{color:var(--t2);background:var(--bg4);cursor:default}
+.qtr-lang{background:var(--bg3);border:1px solid var(--ln2);border-radius:var(--rsm);color:var(--t2);font-family:var(--font);font-size:10.5px;padding:4px 22px 4px 8px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2372727e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;transition:border-color .15s}
+.qtr-lang:focus{border-color:var(--ac)}
+.qtr-row{display:flex;gap:6px;align-items:center}
+.qtr-ico{display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--t3)}
+.qtr-ico svg{width:14px;height:14px}
+#qtr-spin{display:none;width:12px;height:12px;border:2px solid var(--ln2);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+#qtr-btn{display:flex;align-items:center;justify-content:center;gap:5px;background:var(--ac);border:none;border-radius:var(--rsm);color:#fff;font-family:var(--font);font-size:11px;font-weight:600;padding:0 12px;height:30px;cursor:pointer;transition:background .15s;flex-shrink:0}
+#qtr-btn:hover{background:var(--ac2)}
+#qtr-btn svg{width:12px;height:12px}
+#btnQtr{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--ln2);border-radius:6px;color:var(--t3);font-family:var(--font);font-size:10.5px;font-weight:500;padding:3px 9px;cursor:pointer;transition:all .15s}
+#btnQtr:hover,#btnQtr.on{color:var(--ac);border-color:rgba(204,120,50,.4);background:rgba(204,120,50,.07)}
+#btnQtr svg{width:11px;height:11px}
+
+.plugin-logo{width:24px;height:24px;border-radius:7px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));background:rgba(255,255,255,.04);}
+.core-result{white-space:pre-wrap;font-size:11px;line-height:1.65;color:var(--t2);background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:10px;max-height:260px;overflow:auto;}
+.core-log{font-size:10px;color:var(--t3);border-bottom:1px solid rgba(255,255,255,.05);padding:6px 0;}
+.core-log b{color:var(--t2)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="menu-btn" id="menuBtn">
+    <span class="material-symbols-outlined">menu</span>
+  </div>
+  <img src="claw-icon.svg" class="hdr-icon" alt="Claw"/>
+  <div style="flex:1">
+    <div class="hdr-name">Claw</div>
+    <div class="hdr-sub">
+      <span class="live-dot" id="globalDot"></span>
+      <span id="globalStatus">Aguardando</span>
+    </div>
+  </div>
+  <div class="menu-btn" id="btnClearChat" title="Apagar conversa e comecar nova" style="margin-left:4px;">
+    <span class="material-symbols-outlined" style="font-size:18px;">delete_sweep</span>
+  </div>
+  <div class="v-tag">v45</div>
+</div>
+
+<!-- SIDEBAR MENU -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Menu</div>
+    <div class="close-menu" id="closeMenu">
+      <span class="material-symbols-outlined">close</span>
+    </div>
+  </div>
+  
+  <div class="menu-section">
+    <div class="menu-section-title">Principal</div>
+    <div class="menu-item active" data-view="chat">
+      <span class="material-symbols-outlined">chat</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Chat IA</div>
+        <div class="menu-item-sub">Assistente inteligente</div>
+      </div>
+    </div>
+    <div class="menu-item" data-view="features">
+      <span class="material-symbols-outlined">extension</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Recursos</div>
+        <div class="menu-item-sub">Kahoot multi-matérias, StopotS e mais</div>
+      </div>
+    </div>
+    <div class="menu-item" data-view="core">
+      <span class="material-symbols-outlined">hub</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Core IA</div>
+        <div class="menu-item-sub">OCR, memória e estudo</div>
+      </div>
+    </div>
+    <div class="menu-item" data-view="settings">
+      <span class="material-symbols-outlined">settings</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Configurações</div>
+        <div class="menu-item-sub">Personalização e ajustes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">Ferramentas</div>
+    <div class="menu-item" data-view="plugins">
+      <span class="material-symbols-outlined">widgets</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Plugins</div>
+        <div class="menu-item-sub">Sites escolares</div>
+      </div>
+    </div>
+    <div class="menu-item" data-view="macros">
+      <span class="material-symbols-outlined">smart_button</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Macro Recorder</div>
+        <div class="menu-item-sub">Automações gravadas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">Dados</div>
+    <div class="menu-item" data-view="stats">
+      <span class="material-symbols-outlined">analytics</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Estatísticas</div>
+        <div class="menu-item-sub">Histórico de uso</div>
+      </div>
+    </div>
+    <div class="menu-item" data-view="help">
+      <span class="material-symbols-outlined">help</span>
+      <div class="menu-item-info">
+        <div class="menu-item-label">Ajuda</div>
+        <div class="menu-item-sub">Sobre o Claw</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- VIEW CONTAINER -->
+<div class="view-container">
+
+  <!-- VIEW: CHAT IA -->
+  <div class="view active" id="view-chat">
+    <div class="chat-box">
+      <div class="msgs" id="msgs">
+        <div class="msg ai">
+          <div class="msg-avatar">
+            <span class="material-symbols-outlined">psychology</span>
+          </div>
+          <div class="msg-body">Olá! Sou o Claw, seu assistente IA. Posso controlar páginas, buscar informações, automatizar tarefas e muito mais. Como posso ajudar?</div>
+        </div>
+      </div>
+      <div class="chips" id="chips">
+        <div class="chip" onclick="chip('O que você pode fazer?')">Capacidades</div>
+        <div class="chip" onclick="chip('Como usar o Kahoot?')">Kahoot</div>
+        <div class="chip" onclick="chip('Ativar StopotS')">StopotS</div>
+        <div class="chip" onclick="chip('Abrir YouTube')">YouTube</div>
+        <button id="btnQtr" title="Tradutor rapido">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          Traduzir
+        </button>
+      </div>
+
+      <!-- PAINEL TRADUTOR RAPIDO -->
+      <div id="qtr-panel">
+        <div class="qtr-row">
+          <select class="qtr-lang" id="qtr-from">
+            <option value="auto">Detectar</option>
+            <option value="en">Ingles</option>
+            <option value="es">Espanhol</option>
+            <option value="fr">Frances</option>
+            <option value="de">Alemao</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Portugues</option>
+            <option value="ja">Japones</option>
+            <option value="zh">Chines</option>
+            <option value="ko">Coreano</option>
+            <option value="ru">Russo</option>
+            <option value="ar">Arabe</option>
+          </select>
+          <div class="qtr-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+          <select class="qtr-lang" id="qtr-to">
+            <option value="pt-BR">Portugues BR</option>
+            <option value="en">Ingles</option>
+            <option value="es">Espanhol</option>
+            <option value="fr">Frances</option>
+            <option value="de">Alemao</option>
+            <option value="it">Italiano</option>
+            <option value="ja">Japones</option>
+            <option value="zh">Chines</option>
+            <option value="ko">Coreano</option>
+            <option value="ru">Russo</option>
+          </select>
+          <div id="qtr-spin"></div>
+          <button id="qtr-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+            Traduzir
+          </button>
+        </div>
+        <div class="qtr-row">
+          <textarea class="qtr-box" id="qtr-input" placeholder="Digite ou cole o texto..."></textarea>
+        </div>
+        <div class="qtr-row">
+          <textarea class="qtr-box" id="qtr-output" placeholder="Traducao aparece aqui..." readonly></textarea>
+        </div>
+      </div>
+      <div class="input-row" style="flex-direction:column;">
+        <div id="imgPreviewWrap" style="display:none;position:relative;margin-bottom:6px;">
+          <img id="imgPreview" style="max-height:80px;border-radius:8px;border:1px solid rgba(204,120,50,.3);display:block;"/>
+          <button id="btnRemoveImg" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--err);border:none;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">x</button>
+        </div>
+        <input type="file" id="fileImgInput" accept="image/*" style="display:none;"/>
+        <div style="display:flex;gap:5px;align-items:flex-end;width:100%;">
+          <div class="send-btn" id="btnScreenshot" title="Capturar tela atual">
+            <span class="material-symbols-outlined" style="font-size:16px;color:var(--t3);">screenshot</span>
+          </div>
+          <div class="send-btn" id="btnUploadImg" title="Enviar foto do computador">
+            <span class="material-symbols-outlined" style="font-size:16px;color:var(--t3);">image</span>
+          </div>
+          <div class="send-btn" id="btnVoice" title="Falar por voz">
+            <span class="material-symbols-outlined" style="font-size:16px;color:var(--t3);">mic</span>
+          </div>
+          <textarea class="agent-input" id="agentInput" placeholder="Digite sua mensagem..." rows="1" style="flex:1;"></textarea>
+          <div class="send-btn off" id="btnAgent">
+            <span class="material-symbols-outlined">send</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: RECURSOS -->
+  <div class="view" id="view-features">
+    <div class="sec">Assistentes escolares</div>
+    
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">school</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Kahoot Estudo</div>
+            <div class="card-sub">Multi-matérias, foco em matemática, ordem de blocos</div>
+            <div class="pill" id="kahoot-pill">
+              <span class="pill-dot"></span>
+              <span id="kahoot-status">Desativado</span>
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-k"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">casino</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">StopotS Estudo</div>
+            <div class="card-sub">Sugere palavras e copia para uso manual</div>
+            <div class="pill" id="stopots-pill">
+              <span class="pill-dot"></span>
+              <span id="stopots-status">Desativado</span>
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-s"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0"/>
+    <div class="sec">Produtividade</div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">translate</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Tradutor Inline</div>
+            <div class="card-sub">Selecione texto e pressione Alt+T</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-tr"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">description</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Resumidor</div>
+            <div class="card-sub">Alt+S para resumir texto selecionado</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-sum"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">lightbulb</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Explicador</div>
+            <div class="card-sub">Alt+E explica conceitos selecionados</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-exp"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">menu_book</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Modo Estudo</div>
+            <div class="card-sub">Resumo, perguntas e pontos-chave na página atual</div>
+            <div class="pill" id="study-pill">
+              <span class="pill-dot"></span>
+              <span id="study-status">Desativado</span>
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-study"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VIEW: CONFIGURAÇÕES -->
+  <div class="view" id="view-settings">
+    <div class="sec">Personalização</div>
+    
+    <div class="card" style="flex-direction:column;gap:8px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">psychology</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Personalidade da IA</div>
+            <div class="card-sub">Defina como o Claw deve responder</div>
+          </div>
+        </div>
+      </div>
+      <textarea id="personalityInput" placeholder="Ex: Seja direto e técnico. Use exemplos de código. Fale como um dev sênior."></textarea>
+    </div>
+
+    <div class="card" style="flex-direction:column;gap:8px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">key</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">API Key</div>
+            <div class="card-sub">Configure suas APIs Groq para ativar a IA</div>
+          </div>
+        </div>
+      </div>
+      <input type="password" id="apiKeyInput" placeholder="Cole sua API Groq aqui" autocomplete="off"/>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="font-size:10px;color:var(--t3)">Sem APIs fixas nesta versão GitHub. Suporta ciclo/fallback com as chaves salvas.</div>
+        <button id="clearApiKey" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Limpar</button>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:column;gap:10px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">memory</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Modelo IA</div>
+            <div class="card-sub">Escolha o modelo para processamento</div>
+          </div>
+        </div>
+      </div>
+      <select id="modelSelect">
+        <option>Carregando modelos...</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">description</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Contexto da Página</div>
+            <div class="card-sub">Envia título e URL em toda mensagem</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-page-context"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0"/>
+    <div class="sec">Atalhos</div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">keyboard</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Atalho do Chat</div>
+            <div class="card-sub">Abre/fecha o chat flutuante</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+              <kbd id="shortcutLabel">Alt+Space</kbd>
+              <button id="btnRecordShortcut" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Alterar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0"/>
+    <div class="sec">Anti-Detecção</div>
+
+    <div class="card" style="flex-direction:column;gap:10px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">timer</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Delay Humano</div>
+            <div class="card-sub">Espera antes de responder (Kahoot)</div>
+          </div>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Tempo</span>
+        <input type="range" id="delaySlider" min="0" max="8000" step="500" value="0"/>
+        <span class="slider-val" id="delayVal">0s</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">visibility_off</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Modo Stealth</div>
+            <div class="card-sub">Alt+H oculta overlays</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-stealth"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">shield</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Modo Discreto</div>
+            <div class="card-sub">Oculta overlays para foco visual</div>
+            <div class="pill" id="anti-pill">
+              <span class="pill-dot"></span>
+              <span id="anti-status">Desativado</span>
+            </div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-anti"/>
+          <span class="track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:column;gap:10px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">school</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Dificuldade de Treino</div>
+            <div class="card-sub">Mostra desafios de revisão por nível</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tog-miss"/>
+          <span class="track"></span>
+        </label>
+      </div>
+      <div id="missRow" style="display:none">
+        <div class="slider-row">
+          <span class="slider-label">Revisar 1 a cada</span>
+          <input type="range" id="missSlider" min="3" max="10" step="1" value="5"/>
+          <span class="slider-val" id="missVal">5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- VIEW: CORE IA -->
+  <div class="view" id="view-core">
+    <div class="sec">Core System v45</div>
+    <p style="font-size:10px;color:var(--t3);padding:0 2px 10px">Cérebro central para estudo: OCR/visão via print, memória, flashcards, planner, logs e roteador de modelos.</p>
+
+    <div class="card" style="flex-direction:column;gap:9px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><span class="material-symbols-outlined">psychology_alt</span></div>
+          <div class="card-info">
+            <div class="card-label">Ações rápidas de estudo</div>
+            <div class="card-sub">Usa a página atual ou o texto selecionado</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="btnCoreAnalyze" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t2)">Analisar página</button>
+        <button id="btnCoreFlashcards" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t2)">Flashcards</button>
+        <button id="btnCorePlan" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t2)">Plano</button>
+        <button id="btnCoreReview" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t2)">Revisão</button>
+        <button id="btnCorePanel" class="btn-sm" style="background:rgba(204,120,50,.12);border-color:rgba(204,120,50,.25);color:var(--ac3)">Abrir painel</button>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:column;gap:9px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><span class="material-symbols-outlined">monitor_heart</span></div>
+          <div class="card-info">
+            <div class="card-label">Diagnóstico IA</div>
+            <div class="card-sub" id="coreStatusLine">Carregando status...</div>
+          </div>
+        </div>
+        <button id="btnCoreStatus" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Atualizar</button>
+      </div>
+    </div>
+
+    <div class="sec">Resultado</div>
+    <div id="coreResult" class="core-result">Escolha uma ação acima.</div>
+
+    <div class="row-between" style="margin-top:12px">
+      <div class="sec" style="padding:0">Logs</div>
+      <button id="btnCoreClearLogs" class="btn-sm danger">Limpar logs</button>
+    </div>
+    <div id="coreLogs" class="hist-list" style="max-height:170px"><div class="hist-empty">Sem logs ainda</div></div>
+  </div>
+
+  <!-- VIEW: PLUGINS -->
+  <div class="view" id="view-plugins">
+    <div class="sec">Plugins Escolares</div>
+    <p style="font-size:10px;color:var(--t3);padding:0 2px 10px">Cada plugin aparece com a logo do site e ativa automaticamente na página correspondente.</p>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/youtube.svg" alt="YouTube"/></div>
+          <div class="card-info">
+            <div class="card-label">YouTube</div>
+            <div class="card-sub">Resumos de aulas, momentos importantes e perguntas</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/spotify.svg" alt="Spotify"/></div>
+          <div class="card-info">
+            <div class="card-label">Spotify</div>
+            <div class="card-sub">Foco de estudo, timer Pomodoro e playlists</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/gmail.svg" alt="Gmail"/></div>
+          <div class="card-info">
+            <div class="card-label">Gmail</div>
+            <div class="card-sub">Organização e escrita de e-mails escolares</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/docs.svg" alt="Google Docs"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Docs</div>
+            <div class="card-sub">Correção, melhoria e resumo de textos</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/meet.svg" alt="Google Meet"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Meet</div>
+            <div class="card-sub">Notas rápidas, ações e ata de aula</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/classroom.svg" alt="Google Classroom"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Classroom</div>
+            <div class="card-sub">Atividades, tarefas e organização escolar</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/drive.svg" alt="Google Drive"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Drive</div>
+            <div class="card-sub">Busca e organização de arquivos de estudo</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/wikipedia.svg" alt="Wikipedia"/></div>
+          <div class="card-info">
+            <div class="card-label">Wikipedia</div>
+            <div class="card-sub">Resumo escolar e flashcards por assunto</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/khan.svg" alt="Khan Academy"/></div>
+          <div class="card-info">
+            <div class="card-label">Khan Academy</div>
+            <div class="card-sub">Busca de explicações e plano de treino</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/translate.svg" alt="Google Tradutor"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Tradutor</div>
+            <div class="card-sub">Tradução rápida e estudo de idiomas</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon"><img class="plugin-logo" src="plugin-icons/forms.svg" alt="Google Forms"/></div>
+          <div class="card-info">
+            <div class="card-label">Google Forms</div>
+            <div class="card-sub">Leitura e revisão manual de formulários</div>
+          </div>
+        </div>
+        <span class="pill on"><span class="pill-dot"></span><span>Auto</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: MACROS -->
+  <div class="view" id="view-macros">
+    <div class="sec">Gravador de Macros</div>
+    <p style="font-size:10px;color:var(--t3);padding:0 2px 10px">Grave sequências de ações para reproduzir automaticamente na página atual.</p>
+    
+    <div class="card">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">fiber_manual_record</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Macro Recorder</div>
+            <div class="card-sub" id="macroStatusText">Painel pronto para abrir na página</div>
+            <span class="pill" id="macro-pill"><span class="pill-dot"></span><span id="macro-status">Pronto</span></span>
+          </div>
+        </div>
+        <button id="btnMacro" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Abrir</button>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:column;gap:9px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">radio_button_checked</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Controle rápido</div>
+            <div class="card-sub">Abre o painel e controla gravação sem mudar o estilo.</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="btnMacroStart" class="btn-sm" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);color:#f87171">Gravar</button>
+        <button id="btnMacroStop" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Parar</button>
+        <button id="btnMacroRefresh" class="btn-sm" style="background:var(--bg3);border-color:var(--ln);color:var(--t3)">Atualizar</button>
+      </div>
+    </div>
+
+    <div class="sec">Macros Salvos</div>
+    <div id="macroSavedList" class="hist-list" style="max-height:180px">
+      <div class="hist-empty">Nenhum macro salvo ainda</div>
+    </div>
+  </div>
+
+  <!-- VIEW: ESTATÍSTICAS -->
+  <div class="view" id="view-stats">
+    <div class="sec">Uso Geral</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="statKTotal">0</div>
+        <div class="stat-label">Kahoot</div>
+        <div class="stat-today" id="statKToday">0 hoje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statSTotal">0</div>
+        <div class="stat-label">StopotS</div>
+        <div class="stat-today" id="statSToday">0 hoje</div>
+      </div>
+    </div>
+
+    <hr style="margin:16px 0"/>
+    <div class="sec">Cache StopotS</div>
+    <div class="card" style="flex-direction:column;gap:8px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">database</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Cache Turbo</div>
+            <div class="card-sub">Respostas instantâneas offline</div>
+          </div>
+        </div>
+      </div>
+      <div class="cache-row">
+        <div>
+          <div class="cache-lbl">Entradas salvas</div>
+          <div class="cache-num" id="cacheCount">0</div>
+        </div>
+        <button class="btn-sm danger" id="clearCache">Limpar</button>
+      </div>
+    </div>
+
+    <hr style="margin:16px 0"/>
+    <div class="row-between">
+      <div class="sec" style="padding:0">Histórico</div>
+      <button class="btn-sm danger" id="clearHistory">Limpar</button>
+    </div>
+    <div class="hist-list" id="historyList">
+      <div class="hist-empty">Nenhuma atividade ainda</div>
+    </div>
+  </div>
+
+  <!-- VIEW: AJUDA -->
+  <div class="view" id="view-help">
+    <div class="sec">Sobre o Claw</div>
+    <div class="card" style="flex-direction:column;gap:12px">
+      <div class="card-row">
+        <div class="card-left">
+          <div class="card-icon">
+            <span class="material-symbols-outlined">info</span>
+          </div>
+          <div class="card-info">
+            <div class="card-label">Claw - Assistente IA Universal</div>
+            <div class="card-sub">Versão 45.0</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.6">
+        <p style="margin-bottom:8px"><strong>O que é o Claw?</strong></p>
+        <p>Claw é um assistente IA completo que funciona diretamente no seu navegador. Ele ajuda a estudar, resumir páginas, explicar respostas, organizar tarefas e controlar páginas web com comandos.</p>
+        
+        <p style="margin:12px 0 8px"><strong>Principais Recursos:</strong></p>
+        <ul style="padding-left:18px">
+          <li>Chat IA inteligente com múltiplos modelos</li>
+          <li>Assistente de estudo para Kahoot e StopotS</li>
+          <li>Tradução, resumo e explicação de textos</li>
+          <li>Plugins escolares: YouTube, Spotify, Gmail, Docs, Meet, Classroom, Drive, Wikipedia, Khan Academy, Tradutor e Forms</li>
+          <li>Core IA v45 com memória, flashcards, planner, logs e status das APIs</li>
+          <li>Macro Recorder para automações personalizadas</li>
+          <li>Controle de páginas via comandos</li>
+          <li>Modo discreto de interface (Alt+H)</li>
+        </ul>
+
+        <p style="margin:12px 0 8px"><strong>Como Usar:</strong></p>
+        <ul style="padding-left:18px">
+          <li><kbd>Alt+Space</kbd> - Abre o chat flutuante</li>
+          <li><kbd>Alt+T</kbd> - Traduz texto selecionado</li>
+          <li><kbd>Alt+S</kbd> - Resume texto selecionado</li>
+          <li><kbd>Alt+E</kbd> - Explica conceito selecionado</li>
+          <li><kbd>Alt+H</kbd> - Modo stealth (oculta overlays)</li>
+        </ul>
+
+        <p style="margin:12px 0 8px"><strong>Comandos do Chat:</strong></p>
+        <p style="font-size:10px;color:var(--t3);background:var(--bg3);padding:8px;border-radius:6px;font-family:monospace">
+          "Abrir YouTube"<br/>
+          "Pesquisar X no Google"<br/>
+          "Clicar em BOTÃO"<br/>
+          "Preencher campo com TEXTO"<br/>
+          "Rolar até o fim"<br/>
+          "Capturar página completa"<br/>
+          "Extrair todos os links"
+        </p>
+
+        <p style="margin:12px 0 8px"><strong>Modelos IA Disponíveis:</strong></p>
+        <ul style="padding-left:18px;font-size:10px">
+          <li>GPT-OSS 20B (padrão, rápido)</li>
+          <li>Llama 3.3 70B (poderoso)</li>
+          <li>Llama 4 Scout (preview)</li>
+          <li>Qwen3 (multilíngue)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer" style="margin-top:12px">
+      <span class="badge">
+        <span class="badge-dot ok"></span>
+        Groq API
+      </span>
+      <span class="badge">Modelos Open Source</span>
+      <span class="badge" style="margin-left:auto;color:var(--ok2);border-color:rgba(90,158,111,.28)">v45</span>
+    </div>
+    <div class="credits">Desenvolvido por <span>Emanuel Felipe</span></div>
+  </div>
+
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img">
+  <rect width="64" height="64" rx="16" fill="#4285f4"/>
+  <rect x="15" y="14" width="26" height="28" rx="4" fill="#fff" opacity=".96"/>
+  <rect x="27" y="24" width="22" height="25" rx="4" fill="#34a853"/>
+  <text x="28" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#4285f4">G</text>
+  <path d="M34 42l5-11 5 11M36 38h6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

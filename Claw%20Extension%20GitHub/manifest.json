@@ -1,0 +1,185 @@
+{
+  "manifest_version": 3,
+  "name": "Claw",
+  "version": "47.1",
+  "description": "Assistente IA escolar · Advanced School OS limpo · logos locais corrigidas · versão GitHub sem API keys fixas · Smart Router. Por @onerddev.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "tabCapture",
+    "offscreen",
+    "clipboardWrite",
+    "clipboardRead"
+  ],
+  "host_permissions": [
+    "https://kahoot.it/*",
+    "https://*.kahoot.it/*",
+    "https://stopots.com/*",
+    "https://*.stopots.com/*",
+    "https://api.groq.com/*",
+    "<all_urls>",
+    "https://open.spotify.com/*",
+    "https://*.spotify.com/*",
+    "https://classroom.google.com/*",
+    "https://drive.google.com/*",
+    "https://*.wikipedia.org/*",
+    "https://pt.wikipedia.org/*",
+    "https://www.khanacademy.org/*",
+    "https://khanacademy.org/*",
+    "https://translate.google.com/*",
+    "https://forms.google.com/*",
+    "https://docs.google.com/forms/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "memory.js",
+        "cache.js",
+        "rate_limiter.js",
+        "floating_chat.js",
+        "productivity.js",
+        "permissions.js",
+        "study_mode.js",
+        "explain_selection.js",
+        "macro_recorder.js",
+        "commander.js",
+        "claw_core.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://kahoot.it/*",
+        "https://*.kahoot.it/*"
+      ],
+      "js": [
+        "stats.js",
+        "cache.js",
+        "kahoot.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://stopots.com/*",
+        "https://*.stopots.com/*"
+      ],
+      "js": [
+        "stats.js",
+        "stopots.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*"
+      ],
+      "js": [
+        "plugins/youtube.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://open.spotify.com/*"
+      ],
+      "js": [
+        "plugins/spotify.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "plugins/gmail.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://docs.google.com/*"
+      ],
+      "js": [
+        "plugins/google_docs.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://meet.google.com/*"
+      ],
+      "js": [
+        "plugins/meet.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://classroom.google.com/*",
+        "https://drive.google.com/*",
+        "https://*.wikipedia.org/*",
+        "https://pt.wikipedia.org/*",
+        "https://www.khanacademy.org/*",
+        "https://khanacademy.org/*",
+        "https://translate.google.com/*",
+        "https://forms.google.com/*",
+        "https://docs.google.com/forms/*"
+      ],
+      "js": [
+        "plugins/school_sites.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "claude-icon.png",
+        "claw-icon.svg",
+        "icons/*.png",
+        "plugins/*.js",
+        "popup.html",
+        "popup.js",
+        "cache.js",
+        "rate_limiter.js",
+        "explain_selection.js",
+        "macro_recorder.js",
+        "offscreen.html",
+        "offscreen.js",
+        "claw_core.js",
+        "plugins/school_sites.js",
+        "plugin-icons/*.svg"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https://www.google.com;"
+  }
+}
